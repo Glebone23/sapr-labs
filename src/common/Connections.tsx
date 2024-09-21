@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import { Form, } from "@rjsf/mui";
 import { RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv6";
-import { useFormValue } from "../../common/form";
+import { useFormValue } from "./form";
 
 export interface ConnectionVector {
     element: number;
@@ -40,7 +40,7 @@ export function Connections() {
 
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-            <Form schema={schema} validator={validator} formData={value} onChange={updateValue}>
+            <Form schema={schema} validator={validator} formData={value} onChange={({ formData }) => updateValue(formData)}>
                 <></>
             </Form>
         </Box>

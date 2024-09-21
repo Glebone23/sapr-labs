@@ -5,7 +5,7 @@ import {
     DistanceData,
     DistancesData
 } from "./calculateCrossDistance";
-import { Place } from "../labs/lab1/Wizard";
+import { Place } from "../labs/lab1/Lab1";
 
 export function getSumTpl(a: string | number, b: string | number) {
     return `${a}+${b}`;

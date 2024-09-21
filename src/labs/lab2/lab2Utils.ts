@@ -1,7 +1,19 @@
+import { find, forEach, map } from "lodash";
+import { Connection, ConnectionVector } from "../../common/Connections";
+
 type Position = { row: number, col: number };
 type Matrix = (number | null)[][];  // Matrix with number representing node or null
-type Connection = { element: number, amount: number };
-type Connections = Record<number, Connection[]>;
+type ConnectionsMap = Record<number, ConnectionVector[]>;
+
+export function convertConnectionsToMap(connections: Connection[]): ConnectionsMap {
+    const map: ConnectionsMap = {};
+
+    forEach(connections, (connection) => {
+        map[connection.element] = connection.vectors
+    });
+
+    return map;
+}
 
 // Helper function to get Manhattan distance between two positions
 function manhattanDistance(pos1: Position, pos2: Position): number {
@@ -22,7 +34,7 @@ function getAvailablePositions(matrix: Matrix): Position[] {
 }
 
 // Count connections with placed and unplaced elements for a node
-function countConnections(node: number, connections: Connections, matrix: Matrix): { placed: number, unplaced: number } {
+function countConnections(node: number, connections: ConnectionsMap, matrix: Matrix): { placed: number, unplaced: number } {
     let placed = 0;
     let unplaced = 0;
 
@@ -86,7 +98,7 @@ function placeNodeInMatrix(node: number, position: Position, matrix: Matrix): vo
 }
 
 // Find the next node to place based on connection counts
-function findNextNodeToPlace(connections: Connections, matrix: Matrix, placedNodes: Set<number>): number | null {
+function findNextNodeToPlace(connections: ConnectionsMap, matrix: Matrix, placedNodes: Set<number>): number | null {
     let bestNode: number | null = null;
     let maxPlacedConnections = -1;
     let minUnplacedConnections = Infinity;
@@ -107,7 +119,7 @@ function findNextNodeToPlace(connections: Connections, matrix: Matrix, placedNod
 }
 
 // Main function to place nodes in the matrix based on connections
-function placeNodesInMatrix(matrix: Matrix, connections: Connections): Matrix {
+export function placeNodesInMatrix(matrix: Matrix, connections: ConnectionsMap): Matrix {
     let availablePositions = getAvailablePositions(matrix);
     const placedNodes = new Set<number>();
 
@@ -130,7 +142,6 @@ function placeNodesInMatrix(matrix: Matrix, connections: Connections): Matrix {
         const bestPosition = findNearestAvailablePosition(availablePositions, connectedNodes, matrix);
 
         if (bestPosition) {
-            console.log('placeNodeInMatrix', nextNode, matrix);
             placeNodeInMatrix(nextNode, bestPosition, matrix);
             placedNodes.add(nextNode);
             // Remove the used position from available list
@@ -145,33 +156,33 @@ function placeNodesInMatrix(matrix: Matrix, connections: Connections): Matrix {
     return matrix;
 }
 
-// Example of a 5x4 matrix where null represents available spots
-const matrix: Matrix = [
-    [null, null, null, null, null],
-    [7, null, null, null, null],
-    [null, null, null, null, null],
-    [1, null, null, 11, null],
-];
+// // Example of a 5x4 matrix where null represents available spots
+// const matrix: Matrix = [
+//     [null, null, null, null, null],
+//     [7, null, null, null, null],
+//     [null, null, null, null, null],
+//     [1, null, null, 11, null],
+// ];
 
-// Example connections (based on the provided structure)
-const connections: Connections = {
-  1: [{ element: 5, amount: 1 }, { element: 4, amount: 1 }],
-  3: [{ element: 7, amount: 1 }, { element: 4, amount: 3 }],
-  5: [{ element: 1, amount: 1 }, { element: 7, amount: 2 }, { element: 6, amount: 1 }],
-  7: [{ element: 5, amount: 2 }, { element: 3, amount: 1 }],
-  9: [{ element: 10, amount: 1 }, { element: 4, amount: 1 }, { element: 8, amount: 1 }],
-  4: [{ element: 1, amount: 1 }, { element: 9, amount: 1 }, { element: 3, amount: 3 }],
-  8: [{ element: 9, amount: 1 }, { element: 6, amount: 1 }, { element: 11, amount: 1 }],
-  6: [{ element: 8, amount: 1 }, { element: 5, amount: 1 }, { element: 12, amount: 1 }],
-  2: [{ element: 12, amount: 2 }, { element: 11, amount: 1 }],
-  10: [{ element: 9, amount: 1 }, { element: 12, amount: 1 }],
-  11: [{ element: 8, amount: 1 }, { element: 2, amount: 1 }],
-  12: [{ element: 2, amount: 2 }, { element: 6, amount: 1 }, { element: 10, amount: 1 }],
-};
+// // Example connections (based on the provided structure)
+// const connections: ConnectionsMap = {
+//   1: [{ element: 5, amount: 1 }, { element: 4, amount: 1 }],
+//   3: [{ element: 7, amount: 1 }, { element: 4, amount: 3 }],
+//   5: [{ element: 1, amount: 1 }, { element: 7, amount: 2 }, { element: 6, amount: 1 }],
+//   7: [{ element: 5, amount: 2 }, { element: 3, amount: 1 }],
+//   9: [{ element: 10, amount: 1 }, { element: 4, amount: 1 }, { element: 8, amount: 1 }],
+//   4: [{ element: 1, amount: 1 }, { element: 9, amount: 1 }, { element: 3, amount: 3 }],
+//   8: [{ element: 9, amount: 1 }, { element: 6, amount: 1 }, { element: 11, amount: 1 }],
+//   6: [{ element: 8, amount: 1 }, { element: 5, amount: 1 }, { element: 12, amount: 1 }],
+//   2: [{ element: 12, amount: 2 }, { element: 11, amount: 1 }],
+//   10: [{ element: 9, amount: 1 }, { element: 12, amount: 1 }],
+//   11: [{ element: 8, amount: 1 }, { element: 2, amount: 1 }],
+//   12: [{ element: 2, amount: 2 }, { element: 6, amount: 1 }, { element: 10, amount: 1 }],
+// };
 
-// Place nodes in the matrix
-const finalMatrix = placeNodesInMatrix(matrix, connections);
-console.log(finalMatrix);
+// // Place nodes in the matrix
+// const finalMatrix = placeNodesInMatrix(matrix, connections);
+// console.log(finalMatrix);
 
 function findPositionOfElement(matrix: Matrix, element: number): Position | null {
     for (let row = 0; row < matrix.length; row++) {
@@ -184,33 +195,35 @@ function findPositionOfElement(matrix: Matrix, element: number): Position | null
     return null;
 }
 
-// Calculate the efficiency of the matrix based on connections
-export function calculateEfficiency(matrix: Matrix, connections: Connections): number {
-    let totalEfficiency = 0;
-    const seenPairs = new Set<string>();  // To avoid double-counting connections
+export function createManhattanDistanceMatrix(matrix: Matrix, elements: ConnectionsMap): number[][] {
+    const distanceMatrix: number[][] = [];
+    const elementsList = map(elements, (_, key) => Number(key));
 
-    for (const [element, connectionList] of Object.entries(connections)) {
-        const elementPos = findPositionOfElement(matrix, parseInt(element));
+    // Loop through each element pair and calculate Manhattan distance
+    for (let i = 0; i < elementsList.length; i++) {
+        const row: number[] = [];
+        const pos1 = findPositionOfElement(matrix, elementsList[i]);
+        const connection = elements[elementsList[i]];
 
-        if (elementPos) {
-            for (const connection of connectionList) {
-                const connectedElementPos = findPositionOfElement(matrix, connection.element);
+        for (let j = 0; j < elementsList.length; j++) {
+            const hasConnection = find(connection, { element: elementsList[j] });
 
-                if (connectedElementPos) {
-                    const pairKey = [element, connection.element].sort().join('-');
-                    if (!seenPairs.has(pairKey)) {
-                        const distance = manhattanDistance(elementPos, connectedElementPos);
-                        totalEfficiency += distance * connection.amount;
-                        seenPairs.add(pairKey);  // Mark the pair as seen
-                    }
-                }
+            if (!hasConnection) {
+                row.push(0);
+            } else {
+                const pos2 = findPositionOfElement(matrix, elementsList[j]);
+
+            if (pos1 && pos2) {
+                row.push(manhattanDistance(pos1, pos2));
+            } else {
+                row.push(0); // If position not found, set to 0 (shouldn't happen with valid input)
+            }
             }
         }
+
+        distanceMatrix.push(row);
     }
 
-    return totalEfficiency;
+    return distanceMatrix;
 }
 
-
-const efficiencyScore = calculateEfficiency(matrix, connections);
-console.log("Efficiency Score:", efficiencyScore);

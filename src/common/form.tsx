@@ -1,5 +1,5 @@
-import { cloneDeep, get, set } from "lodash";
-import { createContext, useCallback, useContext, useState } from "react";
+import { get, set } from "lodash";
+import { createContext, useContext, useState } from "react";
 
 export const FORM_STORAGE: Record<string, any> = {};
 
@@ -27,7 +27,6 @@ export function useFormState() {
 }
 
 interface FormProviderProps {
-    id: string;
     initialValues: any;
     children: React.ReactNode;
 }
@@ -36,15 +35,15 @@ export function FormProvider<T>(props: FormProviderProps) {
     const { initialValues, children } = props;
     const [state, setState] = useState(() => initialValues);
 
-    const updateValue = useCallback((path: string, value: T) => {
+    const updateValue = (path: string, value: T) => {
         setState((currentState: any) => {
-            const temp = cloneDeep(currentState);
+            const temp = {...currentState};
 
             set(temp, path, value);
 
-            return currentState;
+            return temp;
         });
-    }, []);
+    };
 
     return (
         <FormContext.Provider value={{ state, updateValue }}>

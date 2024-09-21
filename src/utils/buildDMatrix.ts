@@ -10,6 +10,7 @@ import {
 } from "lodash";
 
 export type Matrix = Array<Array<number>>
+export type NullableMatrix = Array<Array<number | null>>
 
 export function buildDMatrix(list: Array<DistanceData>, index: DistancesData, distanceSum: Record<string, number>) {
     const matrix: Matrix = [];

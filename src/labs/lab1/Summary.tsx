@@ -13,8 +13,10 @@ import {
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { BaseMatrix } from '../../common/BaseMatrix';
+import { buildCMatrix } from "../../common/buildCMatrix";
+import { Connection } from "../../common/Connections";
 import { useFormValue } from '../../common/form';
-import { buildCMatrix } from "../../utils/buildCMatrix";
 import {
     buildDMatrix,
     Matrix
@@ -27,15 +29,14 @@ import {
     makeMovements,
     Movement
 } from "../../utils/makeMovement";
-import { Connection } from "./Connections";
 
 interface Props {
     name: string;
     matrix: Matrix;
-    matrixSum: number[];
+    matrixSum?: number[];
 }
 
-function MatrixComp(props: Props) {
+export function MatrixComp(props: Props) {
     const { name, matrix, matrixSum } = props;
 
     return (
@@ -43,45 +44,30 @@ function MatrixComp(props: Props) {
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3 }}>
                 <Typography variant='h5'>{name} =</Typography>
 
-                <TableContainer component={Paper} sx={{ width: 250, borderRadius: 0 }}>
-                    <Table size="small" aria-label="a dense table">
-                        <TableBody>
-                            {matrix.map((line, indexLine) => (
-                                <TableRow key={indexLine}>
-                                    {line.map((item, indexItem) => (
+                <BaseMatrix matrix={matrix}/>
+            </Box>
+
+            {matrixSum && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3 }}>
+                    <Typography variant='h5'>{name}* =</Typography>
+
+                    <TableContainer component={Paper} sx={{ width: 50, borderRadius: 0 }}>
+                        <Table size="small" aria-label="a dense table">
+                            <TableBody>
+                                {matrixSum.map((sum, index) => (
+                                    <TableRow key={index}>
                                         <TableCell
-                                            key={indexItem}
-                                            sx={{ border: '1px solid #aaa'}}
+                                            sx={{ border: '1px solid #aaa', width: 50, height: 50, textAlign: 'center' }}
                                         >
-                                            {item}
+                                            {sum}
                                         </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3 }}>
-                <Typography variant='h5'>{name}* =</Typography>
-
-                <TableContainer component={Paper} sx={{ width: 50, borderRadius: 0 }}>
-                    <Table size="small" aria-label="a dense table">
-                        <TableBody>
-                            {matrixSum.map((sum, index) => (
-                                <TableRow key={index}>
-                                    <TableCell
-                                        sx={{ border: '1px solid #aaa'}}
-                                    >
-                                        {sum}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Box>
+            )}
         </Box>
     );
 }

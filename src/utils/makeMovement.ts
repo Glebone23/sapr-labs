@@ -3,7 +3,7 @@ import {
     cloneDeep,
     sortBy
 } from "lodash";
-import { Connection } from "../labs/lab1/Connections";
+import { Connection } from "../common/Connections";
 
 export interface Movement {
     c: number;
@@ -43,7 +43,6 @@ export function makeMovements(
 
         for (let j = 0; j < connections.length; j++) {
             if (connections[j].element === dIndex) {
-                console.log(dIndex, cIndex);
                 movedConnections[j].element = cIndex;
             }
 

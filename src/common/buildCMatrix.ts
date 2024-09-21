@@ -6,8 +6,8 @@ import {
     size,
     sum
 } from "lodash";
-import { Matrix } from "./buildDMatrix";
-import { Connection } from "../labs/lab1/Connections";
+import { Matrix } from "../utils/buildDMatrix";
+import { Connection } from "./Connections";
 
 export function buildCMatrix(connections: Connection[]) {
     const matrix: Matrix = [];
