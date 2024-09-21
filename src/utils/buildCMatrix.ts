@@ -4,11 +4,10 @@ import {
     isEmpty,
     map,
     size,
-    sortBy,
     sum
 } from "lodash";
 import { Matrix } from "./buildDMatrix";
-import { Connection } from "../Connections";
+import { Connection } from "../labs/lab1/Connections";
 
 export function buildCMatrix(connections: Connection[]) {
     const matrix: Matrix = [];

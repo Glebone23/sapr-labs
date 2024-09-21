@@ -1,10 +1,8 @@
-import validator from "@rjsf/validator-ajv6";
-import { FORM_STATE } from "./Wizard";
-import { set } from "lodash";
-import React from "react";
 import Box from "@mui/material/Box";
 import { Form, } from "@rjsf/mui";
 import { RJSFSchema } from "@rjsf/utils";
+import validator from "@rjsf/validator-ajv6";
+import { useFormValue } from "../../common/form";
 
 export interface ConnectionVector {
     element: number;
@@ -38,11 +36,11 @@ const schema: RJSFSchema = {
 };
 
 export function Connections() {
+    const { value, updateValue } = useFormValue('connections');
+
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-            <Form schema={schema} validator={validator} formData={FORM_STATE.connections} onChange={({ formData }) => {
-                set(FORM_STATE, 'connections', formData)
-            }}>
+            <Form schema={schema} validator={validator} formData={value} onChange={updateValue}>
                 <></>
             </Form>
         </Box>

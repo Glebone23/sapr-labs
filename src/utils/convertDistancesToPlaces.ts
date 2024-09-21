@@ -1,4 +1,4 @@
-import { Place } from "../Wizard";
+import { Place } from "../labs/lab1/Wizard";
 import { DistancesData } from "./calculateCrossDistance";
 import {
     map,

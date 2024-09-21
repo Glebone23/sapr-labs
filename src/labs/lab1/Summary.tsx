@@ -1,12 +1,4 @@
-import {
-    buildDMatrix,
-    Matrix
-} from "./utils/buildDMatrix";
-import { convertPlacesToDistancesData } from "./utils/convertPlacesToDistancesData";
-import { FORM_STATE } from "./Wizard";
-import React from "react";
-import Box from "@mui/material/Box";
-import { buildCMatrix } from "./utils/buildCMatrix";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
     Accordion,
     AccordionDetails,
@@ -19,16 +11,23 @@ import {
     TableContainer,
     TableRow
 } from "@mui/material";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { useFormValue } from '../../common/form';
+import { buildCMatrix } from "../../utils/buildCMatrix";
+import {
+    buildDMatrix,
+    Matrix
+} from "../../utils/buildDMatrix";
+import { calculateCriteria } from "../../utils/calculateCriteria";
+import { DistancesData } from "../../utils/calculateCrossDistance";
+import { convertDistancesToPlaces } from "../../utils/convertDistancesToPlaces";
+import { convertPlacesToDistancesData } from "../../utils/convertPlacesToDistancesData";
 import {
     makeMovements,
     Movement
-} from "./utils/makeMovement";
-import { DistancesData } from "./utils/calculateCrossDistance";
-import { calculateCriteria } from "./utils/calculateCriteria";
-import { convertDistancesToPlaces } from "./utils/convertDistancesToPlaces";
+} from "../../utils/makeMovement";
 import { Connection } from "./Connections";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface Props {
     name: string;
@@ -114,10 +113,12 @@ function MovementsComp(props: MovementsCompProps) {
 }
 
 export function Summary() {
-    const { list, index, distanceSum } = convertPlacesToDistancesData(FORM_STATE.places);
+    const { value: places } = useFormValue('places')
+    const { value: connections } = useFormValue('connections')
+    const { list, index, distanceSum } = convertPlacesToDistancesData(places);
     const dMatrix = buildDMatrix(list, index, distanceSum);
-    const cMatrix = buildCMatrix(FORM_STATE.connections);
-    const { movements, movedIndex, connections } = makeMovements(dMatrix.matrixSum, cMatrix.matrixSum, index, FORM_STATE.connections);
+    const cMatrix = buildCMatrix(connections);
+    const { movements, movedIndex, connections: movedConnections } = makeMovements(dMatrix.matrixSum, cMatrix.matrixSum, index, connections);
 
     // indexes are incorrect, since that calculation are incorrect as well
     const newPlaces = convertDistancesToPlaces(movedIndex);
@@ -129,11 +130,10 @@ export function Summary() {
     );
     const kFinish = calculateCriteria(
         buildDMatrix(distances.list, distances.index, distances.distanceSum).matrix,
-        buildCMatrix(connections).matrix,
+        cMatrix.matrix,
     );
 
     const newDMatrix = buildDMatrix(distances.list, distances.index, distances.distanceSum);
-    const newCMatrix = buildCMatrix(connections);
 
     return (
         <Box sx={{ width: 600, margin: '0 auto' }}>
@@ -143,7 +143,7 @@ export function Summary() {
             <br/>
             <MatrixComp name='C' matrix={cMatrix.matrix} matrixSum={cMatrix.matrixSum}/>
             <br/>
-            <MovementsComp movements={movements} index={movedIndex} connections={connections}/>
+            <MovementsComp movements={movements} index={movedIndex} connections={movedConnections}/>
 
             <Accordion sx={{ width: 600, margin: '0 auto !important' }}>
                 <AccordionSummary
@@ -155,9 +155,6 @@ export function Summary() {
                 </AccordionSummary>
                 <AccordionDetails>
                     <MatrixComp name='D' matrix={newDMatrix.matrix} matrixSum={newDMatrix.matrixSum}/>
-                    <br/>
-                    <MatrixComp name='C' matrix={newCMatrix.matrix} matrixSum={newCMatrix.matrixSum}/>
-                    <br/>
                 </AccordionDetails>
             </Accordion>
 

@@ -1,12 +1,11 @@
-import { Place } from "../Wizard";
 import {
-    forEach,
     size
 } from "lodash";
 import {
     DistanceData,
     DistancesData
 } from "./calculateCrossDistance";
+import { Place } from "../labs/lab1/Wizard";
 
 export function getSumTpl(a: string | number, b: string | number) {
     return `${a}+${b}`;

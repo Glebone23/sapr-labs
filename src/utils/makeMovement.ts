@@ -1,10 +1,9 @@
 import { DistancesData } from "./calculateCrossDistance";
 import {
     cloneDeep,
-    forEach,
     sortBy
 } from "lodash";
-import { Connection } from "../Connections";
+import { Connection } from "../labs/lab1/Connections";
 
 export interface Movement {
     c: number;
@@ -30,8 +29,8 @@ export function makeMovements(
     const movedConnections: Connection[] = cloneDeep(connections);
 
     for (let i = 0; i < dSorted.length; i++) {
-        const { index: cIndex, value: cValue } = cSorted[i]; // to take
-        const { index: dIndex, value: dValue } = dSorted[i]; // to paste
+        const { index: cIndex } = cSorted[i]; // to take
+        const { index: dIndex } = dSorted[i]; // to paste
 
         const value = index[dIndex];
 
