@@ -13,10 +13,12 @@ function randomColor() {
 }
 
 interface Props {
+    title: string;
     grids: Grid[];
+    performanceTime: number;
 }
 
-export function Lab3Grids({ grids }: Props) {
+export function Lab3Grids({ title, grids, performanceTime }: Props) {
     const { colors, routes, totalWireLength } = useMemo(() => {
         const colors: Map<string, string> = new Map();
         const routes: string[][][] = [];
@@ -47,7 +49,7 @@ export function Lab3Grids({ grids }: Props) {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
-            <Typography align='center' variant='h5'>Хвильовий Алгоритм Лі</Typography>
+            <Typography align='center' variant='h5'>{title}</Typography>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                 {routes.map((rows, routeIndex) => (
@@ -82,6 +84,7 @@ export function Lab3Grids({ grids }: Props) {
             </Box>
 
             <Typography align='center' variant='h6'>Критерій якості: {totalWireLength}</Typography>
+            <Typography align='center' variant='h6'>Час виконання: {performanceTime.toFixed(3)}мс</Typography>
         </Box>
     );
 }

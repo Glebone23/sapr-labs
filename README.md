@@ -18,6 +18,13 @@ Code: [Lab2](/src/labs/lab2)
 
 Demo: https://glebone23.github.io/sapr-labs/#/lab2
 
+## Laboratory work 3
+### Study of the Lee wave algorithm and the ray tracing algorithm
+
+Code: [Lab3](/src/labs/lab3)
+
+Demo: https://glebone23.github.io/sapr-labs/#/lab3
+
 
 # СИСТЕМИ АВТОМАТИЗОВАНОГО ПРОЕКТУВАННЯ ЗАСОБІВ ОБЧИСЛЮВАЛЬНОЇ ТЕХНІКИ
 
@@ -38,4 +45,11 @@ Demo: https://glebone23.github.io/sapr-labs/#/lab2
 Код: [Lab2](/src/labs/lab2)
 
 Демо: https://glebone23.github.io/sapr-labs/#/lab2
+
+## Лабораторна робота 3
+### Дослідження хвильового алгоритму Лі і променевого алгоритму трасування
+
+Код: [Lab3](/src/labs/lab3)
+
+Демо: https://glebone23.github.io/sapr-labs/#/lab3
 

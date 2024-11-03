@@ -94,7 +94,23 @@ export class Grid {
     }
   }
 
-  connectElements(): boolean {
+  private constructBidirectionalPath(start: Point, end: Point, parentMapA: Map<string, Point>, parentMapB: Map<string, Point>, meetingPoint: Point): Point[] {
+    const pathA = this.constructPath(start, meetingPoint, parentMapA);
+    const pathB = this.constructPath(end, meetingPoint, parentMapB);
+    pathB.shift(); // Remove the meeting point from the second path to avoid duplication
+    return pathA.concat(pathB);
+}
+
+  connectElements(algorithm: 'lee' | 'ray' = 'lee'): boolean {
+    if (algorithm === 'lee') {
+      return this.leeAlgorithm();
+    } else if (algorithm === 'ray') {
+      return this.rayAlgorithm();
+    }
+    return false;
+  }
+
+  leeAlgorithm(): boolean {
     let allPathsFound = true;
     
     this.connections.forEach(({ connection }) => {
@@ -117,6 +133,99 @@ export class Grid {
     });
     return allPathsFound;
   }
+
+    rayAlgorithm(): boolean {
+        let allPathsFound = true;
+        
+        this.connections.forEach(({ connection }) => {
+            if (connection.paths.length === 0) {
+                // Use the updated rayFindPath method (described below)
+                const path = this.rayFindPath(connection.start, connection.end);
+                if (path) {
+                    const intermediatePath = path.slice(1, path.length - 1);
+                    connection.addPath(intermediatePath, this.currentDrawOrder);
+
+                    intermediatePath.forEach(point => {
+                        this.occupiedCells.add(`${point.x},${point.y}`);
+                    });
+
+                    this.currentDrawOrder++;
+                } else {
+                    console.log(`Could not find a path for ${connection.id}`);
+                    allPathsFound = false;
+                }
+            }
+        });
+        return allPathsFound;
+    }
+
+    rayFindPath(start: Point, end: Point): Point[] | null {
+        const rays = [
+            { x: 0, y: -1 },  // Up
+            { x: 1, y: 0 },   // Right
+            { x: 0, y: 1 },   // Down
+            { x: -1, y: 0 }   // Left
+        ];
+
+        const queueA: Point[] = [start];
+        const queueB: Point[] = [end];
+        const visitedA: Map<string, Point> = new Map();
+        const visitedB: Map<string, Point> = new Map();
+        const parentMapA: Map<string, Point> = new Map();
+        const parentMapB: Map<string, Point> = new Map();
+
+        visitedA.set(`${start.x},${start.y}`, start);
+        visitedB.set(`${end.x},${end.y}`, end);
+
+        while (queueA.length > 0 && queueB.length > 0) {
+            // Expand from start
+            const currentA = queueA.shift()!;
+            for (const direction of rays) {
+                const nextA: Point = { x: currentA.x + direction.x, y: currentA.y + direction.y };
+                const nextKeyA = `${nextA.x},${nextA.y}`;
+
+                if (
+                    nextA.x >= 0 && nextA.x < this.width &&
+                    nextA.y >= 0 && nextA.y < this.height &&
+                    !visitedA.has(nextKeyA) &&
+                    (this.grid[nextA.y][nextA.x] === null || (nextA.x === end.x && nextA.y === end.y)) &&
+                    !this.occupiedCells.has(nextKeyA)
+                ) {
+                    queueA.push(nextA);
+                    visitedA.set(nextKeyA, nextA);
+                    parentMapA.set(nextKeyA, currentA);
+
+                    if (visitedB.has(nextKeyA)) {
+                        return this.constructBidirectionalPath(start, end, parentMapA, parentMapB, nextA);
+                    }
+                }
+            }
+
+            // Expand from end
+            const currentB = queueB.shift()!;
+            for (const direction of rays) {
+                const nextB: Point = { x: currentB.x + direction.x, y: currentB.y + direction.y };
+                const nextKeyB = `${nextB.x},${nextB.y}`;
+
+                if (
+                    nextB.x >= 0 && nextB.x < this.width &&
+                    nextB.y >= 0 && nextB.y < this.height &&
+                    !visitedB.has(nextKeyB) &&
+                    (this.grid[nextB.y][nextB.x] === null || (nextB.x === start.x && nextB.y === start.y)) &&
+                    !this.occupiedCells.has(nextKeyB)
+                ) {
+                    queueB.push(nextB);
+                    visitedB.set(nextKeyB, nextB);
+                    parentMapB.set(nextKeyB, currentB);
+
+                    if (visitedA.has(nextKeyB)) {
+                        return this.constructBidirectionalPath(start, end, parentMapA, parentMapB, nextB);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
   findPath(start: Point, end: Point): Point[] | null {
     const queue: Point[] = [start];
@@ -197,13 +306,13 @@ export function generateGridsUntilAllPathsFound(
   height: number,
   elements: { id: string, position: Point }[],
   connections: { id1: string, id2: string, count: number }[],
-  maxAttempts: number = 5 // Maximum number of attempts to avoid infinite loop
+  algorithm: 'lee' | 'ray' = 'lee' // Algorithm choice: 'lee' or 'ray'
 ) {
   let grids: Grid[] = [];
   let incompleteConnections = [...connections]; // Track unresolved connections
   let attempt = 1;
 
-  while (incompleteConnections.length > 0 && attempt <= maxAttempts) {
+  while (incompleteConnections.length > 0 && attempt <= 5) {
     console.log(`\nAttempt ${attempt}: Creating a new grid`);
 
     // Create a new grid for this attempt
@@ -218,7 +327,7 @@ export function generateGridsUntilAllPathsFound(
     );
 
     // Try to build paths
-    grid.connectElements();
+    grid.connectElements(algorithm);
 
     // Track grids even if they don’t complete all connections
     grids.push(grid);
