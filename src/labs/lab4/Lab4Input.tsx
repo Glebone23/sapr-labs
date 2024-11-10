@@ -1,0 +1,64 @@
+import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, TextField } from "@mui/material";
+import { useFormValue } from "../../common/form";
+import { useCallback } from "react";
+import { set } from "lodash";
+
+interface MatrixCompProps {
+    path: string;
+}
+
+export function InputMatrixComp(props: MatrixCompProps) {
+    const { value, updateValue } = useFormValue(props.path);
+
+    const handleUpdate = useCallback((x: number, y: number, val?: string | null) => {
+        const temp = [...value];
+        
+        set(temp, `[${y}][${x}]`, val);
+
+        updateValue(temp);
+    }, [updateValue, value]);
+
+    return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3 }}>
+            <TableContainer component={Paper} sx={{ borderRadius: 0, width: value[0].length * 50 }}>
+                <Table size="small" aria-label="a dense table">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell sx={{ border: '1px solid #aaa', fontWeight: 600 }}>X1</TableCell>
+                            <TableCell sx={{ border: '1px solid #aaa', fontWeight: 600 }}>X2</TableCell>
+                            <TableCell sx={{ border: '1px solid #aaa', fontWeight: 600 }}>X3</TableCell>
+                            <TableCell sx={{ border: '1px solid #aaa', fontWeight: 600 }}>X4</TableCell>
+                            <TableCell sx={{ border: '1px solid #aaa', fontWeight: 600 }}>Y</TableCell>
+                        </TableRow>
+                        {(value as Array<Array<number>>).map((line, indexLine) => (
+                            <TableRow key={indexLine}>
+                                {line.map((item, indexItem) => (
+                                    <TableCell
+                                        key={indexItem}
+                                        sx={{ border: '1px solid #aaa', padding: 0 }}
+                                    >
+                                        <TextField
+                                            InputProps={{
+                                                sx: { borderRadius: '0 !important' },
+                                            }}
+                                            value={value[indexLine][indexItem]}
+                                            onChange={(e) => handleUpdate(indexItem, indexLine, e.target.value)}
+                                        />
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
+}
+
+export function Lab4Inpput() {
+    return (
+        <Box>
+            <InputMatrixComp path='input'/>
+        </Box>
+    );
+}
